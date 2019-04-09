@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>simple_linear_classifier</Name>
     <RootNamespace>simple_linear_classifier</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>CondaEnv|CondaEnv|tc</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +24,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="simple_linear_classifier.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|tc" />
+    <InterpreterReference Include="CondaEnv|CondaEnv|TF_VS_35" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
