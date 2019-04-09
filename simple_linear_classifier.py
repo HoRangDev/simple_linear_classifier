@@ -2,13 +2,14 @@ import os
 import numpy as np
 
 class GradientDescent:
-    def __init__(self, init_weight, learning_rate, datas, class_w1_idx, class_w2_idx):
+    def __init__(self, init_weight, learning_rate, datas, class_w1_idx, class_w2_idx, epochs):
         self.learning_rate = learning_rate
         self.class_1_data = datas[class_w1_idx]
         self.class_2_data = datas[class_w2_idx]
         self.class_w1_idx = class_w1_idx
         self.class_w2_idx = class_w2_idx
         self.weight = init_weight
+        self.epochs = epochs
 
     def get_missclasified_samples(self):
         missclasified = []
@@ -31,21 +32,45 @@ class GradientDescent:
 
 class PerceptronClassifier(GradientDescent):
     def __init__(self, init_weight, learning_rate, datas, class_w1_idx, class_w2_idx, epochs):
-        super().__init__(init_weight, learning_rate, datas, class_w1_idx, class_w2_idx)
-        self.epochs = epochs
+        super().__init__(init_weight, learning_rate,
+                        datas, class_w1_idx, class_w2_idx,
+                       epochs)
 
     def d_criterion_func(self, missclassified_samples):
         return np.sum(missclassified_samples)
     
     def learn(self):
         k = 0
-        missclassified_samples = super().get_missclasified_samples()
         while (k < self.epochs):
+            missclassified_samples = super().get_missclasified_samples()
+            print('current epochs: ' , k, ' weight: ', self.weight, ' missclasified: ', len(missclassified_samples))
             k += 1
             prog = self.learning_rate * self.d_criterion_func(missclassified_samples)
             self.weight = self.weight - prog
-            missclassified_samples = super().get_missclasified_samples()
-            print('current epochs: ' , k, ' weight: ', self.weight, ' missclasified: ', len(missclassified_samples))
+
+class RelaxationClassifier(GradientDescent):
+        def __init__(self, init_weight, learning_rate, datas, class_w1_idx, class_w2_idx, epochs, margin):
+            super().__init__(init_weight, learning_rate, 
+                             datas, class_w1_idx, class_w2_idx, 
+                             epochs)
+            self.margin = margin
+
+        def d_criterion_func(self, missclassified_samples):
+            # b is margin
+            sum = np.zeros(shape = 2)
+            for sample in missclassified_samples:
+                sum += ((np.dot(self.weight, sample) - self.margin)/np.power(np.linalg.norm(sample), 2))*sample
+            return sum
+
+        def learn(self):
+            k = 0
+            while (k<self.epochs):
+                missclassified_samples = super().get_missclasified_samples()
+                print('current epochs: ' , k, ' weight: ', self.weight, ' missclasified: ', len(missclassified_samples))
+                k += 1
+                prog = self.learning_rate * self.d_criterion_func(missclassified_samples)
+                self.weight = self.weight - prog
+
 
 def load_datas(filePath):
     # 3 classes, each 10 samples, x y class_idx
@@ -71,5 +96,9 @@ def print_datas(datas):
 datas = load_datas('data.txt')
 print_datas(datas)
 
-classifier = PerceptronClassifier(np.array([1.0, 1.5]), 0.001, datas, 0, 1, 50 )
-classifier.learn()
+percep_classifier = PerceptronClassifier(np.array([1.0, 1.5]), 0.001, datas, 0, 1, 50 )
+percep_classifier.learn()
+
+#relax_classifier = RelaxationClassifier(np.array([1.0, 1.5]), 0.001, datas, 0, 2, 1500, 0.1)
+relax_classifier = RelaxationClassifier(np.array([3.0, 5.5]), 0.0001, datas, 0, 2, 30000, 0.1)
+relax_classifier.learn()
