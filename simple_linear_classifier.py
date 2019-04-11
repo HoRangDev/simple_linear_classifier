@@ -337,10 +337,10 @@ init_weights = [
 #################################################################################
 
 # Data ploting
-#   plt.title('Training datas')
-#   plot_datas(datas, ['ro', 'bo', 'ko'])
-#   plt.legend(loc="upper right")
-#   plt.show()
+plt.title('Training datas')
+plot_datas(datas, ['ro', 'bo', 'ko'])
+plt.legend(loc="upper right")
+plt.show()
 
 # perceptron, relaxation, windrow
 
@@ -376,9 +376,13 @@ plot_relaxation_init_weight_var(init_weights, datas)
 plot_lms_init_weight_var(init_weights, datas)
 
 #relax_classifier = RelaxationClassifier(np.array([1.0, 1.5]), 0.001, datas, 0, 2, 1500, 0.1)
-# learning rate 를 0.1로 올리면 weight_vector가 어느 한 점으로 수렴해버림
-#relax_classifier = RelaxationClassifier(init_weights[0], 0.01, datas, 0, 2, 100, 0.1)
-#relax_classifier.learn()
+# learning rate 를 0.1로 올리면 weight_vector가 매우 빠르게 어느 한 점으로 수렴해버림
+print("Relaxation classifier with margin 0.1")
+relax_classifier = RelaxationClassifier(init_weights[0], 0.01, datas, 0, 2, 100, 0.1)
+ret = relax_classifier.learn(True)
+plot_learning_datas(ret, 100, 'Relaxation;margin 0.1', 'r-')
 
-#lms_classifier = LMSClassifier(init_weights[3], 0.01, datas, 0, 2, 100, 0.2)
-#lms_classifier.learn()
+print("Relaxation classifier with margin 0.5")
+relax_classifier = RelaxationClassifier(init_weights[0], 0.01, datas, 0, 2, 100, 0.5)
+ret = relax_classifier.learn(True)
+plot_learning_datas(ret, 100, 'Relaxation;margin 0.1', 'k-')
